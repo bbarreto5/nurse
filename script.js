@@ -227,6 +227,17 @@
     })
   );
 
+  /* ---------- Analytics: CTA clicks (GA4 / GTM / Plausible, if installed) ---------- */
+  // Events: whatsapp_click, service_click, hiring_click, phone_click, cv_download
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-track]");
+    if (!el) return;
+    const params = { cta_label: el.dataset.trackLabel || "", link_url: el.href || "" };
+    if (typeof window.gtag === "function") window.gtag("event", el.dataset.track, { ...params, transport_type: "beacon" });
+    else (window.dataLayer = window.dataLayer || []).push({ event: el.dataset.track, ...params });
+    if (typeof window.plausible === "function") window.plausible(el.dataset.track, { props: params });
+  });
+
   /* ---------- Footer year ---------- */
   document.querySelector("[data-year]").textContent = new Date().getFullYear();
 })();
